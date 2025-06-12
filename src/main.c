@@ -62,6 +62,6 @@ int main(void) {
 		SEGGER_RTT_WriteString(0, "Hello World from SEGGER!\r\n");
 		_Delay(100);
 	} while (1);
-  
+
   return 0;
 }

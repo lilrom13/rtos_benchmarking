@@ -118,7 +118,6 @@
  *   Use __attribute__ ((long_call, section (".fastcode"))) to move functions
  *   into the RAM.
  */
-
 OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 
@@ -128,6 +127,16 @@ ENTRY(Reset_Handler)
 /* force linker to include the syscalls from libxpcc.a */
 EXTERN(_sbrk_r)
 EXTERN(_init)
+
+MEMORY
+{
+	ROM (rx)      : ORIGIN = 0x08000000, LENGTH = 1m
+	RAM (rwx)     : ORIGIN = 0x20000000, LENGTH = 112k	/* Main internal SRAM1 */
+	AUX_RAM (rwx) : ORIGIN = 0x2001C000, LENGTH = 16k	/* Auxiliary internal SRAM2 */
+	
+	/* Core Coupled Memory, can only be accessed by the CPU */
+	CCM (rwx)     : ORIGIN = 0x10000000, LENGTH = 64k
+}
 
 PROVIDE(__ram_start = ORIGIN(RAM));
 PROVIDE(__ram_end   = ORIGIN(RAM) + LENGTH(RAM));
@@ -394,3 +403,4 @@ SECTIONS
 	.ARM.attributes 0 : { KEEP (*(.ARM.attributes)) }
 	/DISCARD/ : { *(.note.GNU-stack)  }
 }
+

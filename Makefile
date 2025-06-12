@@ -13,7 +13,7 @@ CCFLAGS += -Wall -Wextra
 
 # Linker Flags
 LINKFLAGS  = -mcpu=cortex-m4 -mthumb
-LINKFLAGS += -nostartfiles -L. -Tsrc/stm32f4xx_g.ld
+LINKFLAGS += -nostartfiles -L. -Tsrc/stm32f4xx.ld
 
 # Assembler Flags
 ASFLAGS  = -mcpu=cortex-m4 -mthumb -mthumb-interwork
