@@ -38,10 +38,11 @@ LINKFLAGS += -Wl,--relax -Wl,--gc-sections
 CCFLAGS += -O0 -g
 
 build:
-	arm-none-eabi-gcc $(CFLAGS) $(CCFLAGS) -Isrc/include -Isrc/include/st -c -o src/build/obj/main.o    src/main.c
-	arm-none-eabi-gcc $(CFLAGS) $(CCFLAGS) -Isrc/include -Isrc/include/st -c -o src/build/obj/startup.o src/startup.c   
+	arm-none-eabi-gcc $(CFLAGS) $(CCFLAGS) -Isrc/include -Isrc/include/st -Ithird_party/segger/segger_rtt_v840/rtt -Ithird_party/segger/segger_rtt_v840/config -c -o src/build/obj/segger_rtt.o    third_party/segger/segger_rtt_v840/rtt/SEGGER_RTT.c
+	arm-none-eabi-gcc $(CFLAGS) $(CCFLAGS) -Isrc/include -Isrc/include/st -Ithird_party/segger/segger_rtt_v840/rtt -Ithird_party/segger/segger_rtt_v840/config -c -o src/build/obj/main.o    src/main.c
+	arm-none-eabi-gcc $(CFLAGS) $(CCFLAGS) -Isrc/include -Isrc/include/st -c -o src/build/obj/startup.o src/startup.c
 	
-	arm-none-eabi-gcc $(LINKFLAGS) -o src/build/program.elf src/build/obj/main.o src/build/obj/startup.o
+	arm-none-eabi-gcc $(LINKFLAGS) -o src/build/program.elf src/build/obj/segger_rtt.o src/build/obj/main.o src/build/obj/startup.o
 
 program: build
 	openocd -f openocd.cfg
