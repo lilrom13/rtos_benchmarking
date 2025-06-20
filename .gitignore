@@ -1,4 +1,6 @@
 # Editor/IDE
 .vscode/
 
-src/build/*
+build/*
+
+compile_commands.json

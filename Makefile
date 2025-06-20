@@ -70,7 +70,9 @@ OBJECTS += $(patsubst %.c,$(OBJDIR)/%.o,$(C_SRC_FILES))
 
 LINKER_SCRIPT := $(LINKER_DIR)/stm32f4xx.ld
 
-all: $(OBJECTS)
+all: $(OUTPUT)/program.elf
+
+$(OUTPUT)/program.elf: $(OBJECTS)
 	@echo "Executing target '$@'"
 	@mkdir -p $(OUTPUT)
 	$(CC) $(LINKFLAGS) -T$(LINKER_SCRIPT) -o $(OUTPUT)/program.elf $(OBJECTS)
@@ -81,7 +83,10 @@ $(OBJDIR)/%.o: %.c
 	$(CC) $(CFLAGS) $(CCFLAGS) $(INC) -c -o $(OBJDIR)/$*.o $<
 
 clean:
-	$(RM) $(OBJDIR)/*.o
+	$(RM) -r $(OBJDIR)
 	$(RM) $(OUTPUT)/program.elf
 
-.PHONY: all program clean
+re: clean all
+	@echo "Rebuilding project..."
+
+.PHONY: clean re
