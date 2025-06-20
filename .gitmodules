@@ -1,0 +1,18 @@
+[submodule "Drivers/STM32F4xx_HAL_Driver"]
+	path = Drivers/STM32F4xx_HAL_Driver
+	url = https://github.com/STMicroelectronics/stm32f4xx_hal_driver.git
+[submodule "Middlewares/Third_Party/FreeRTOS"]
+	path = Middlewares/Third_Party/FreeRTOS
+	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
+[submodule "Middlewares/Third_Party/SEGGER/RTT"]
+	path = Middlewares/Third_Party/SEGGER/RTT
+	url = https://github.com/SEGGERMicro/RTT.git
+[submodule "Middlewares/Third_Party/SEGGER/SystemView"]
+	path = Middlewares/Third_Party/SEGGER/SystemView
+	url = https://github.com/SEGGERMicro/SystemView.git
+[submodule "drivers/CMSIS"]
+	path = drivers/CMSIS
+	url = https://github.com/ARM-software/CMSIS_6.git
+[submodule "drivers/Device/ST"]
+	path = drivers/Device/ST
+	url = https://github.com/STMicroelectronics/cmsis-device-f4.git
