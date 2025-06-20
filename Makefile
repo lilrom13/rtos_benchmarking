@@ -53,7 +53,8 @@ INC = -I$(THIRD_DIR)/SEGGER/include
 ## Core application files
 ### Source files
 C_APP_SRC_FILES 	:= 	$(CORE_DIR)/startup.c \
-						$(CORE_DIR)/Main_RTT_MenuApp.c
+						$(CORE_DIR)/main.c \
+						$(CORE_DIR)/app_task.c
 ### Include files
 INC += -I$(CORE_DIR)/include
 INC += -I$(DRIVERS_DIR)/Device/ST/Include
@@ -87,6 +88,5 @@ clean:
 	$(RM) $(OUTPUT)/program.elf
 
 re: clean all
-	@echo "Rebuilding project..."
 
 .PHONY: clean re

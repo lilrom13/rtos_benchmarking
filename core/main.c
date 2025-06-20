@@ -4,64 +4,43 @@
 
 #include <stm32f4xx.h>
 
-/* Other includes */
-#include "SEGGER_RTT.h"
+#include "app_task.h"
 
-extern void delay_us(uint32_t us);
+#include "config/app_config.h"
 
-/**
- * Stub required by newlibc.
- * 
- * E.g. for malloc()
- */
-void _sbrk(void)
+#ifdef APP_DEBUG
+	#include "SEGGER_SYSVIEW.h"
+	#include "SEGGER_RTT.h"
+#endif
+
+static AppTaskInfo backgroundTask = {
+	.taskId = 1,
+	.name = "Background Task",
+	.taskFunction = NULL, // Define your background task function here
+	.priority = APP_TASK_PRIORITY_LOWEST
+};
+
+int main(void)
 {
-}
+#ifdef APP_DEBUG
+	// Initialize SEGGER SystemView for debugging
+	SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL);
 
-/**
- * Stub required by newlibc.
- *
- * Used for static constructors in C++
- */
-void _init(void)
-{
-}
+	SEGGER_RTT_WriteString(0, "Real-Time Application\r\n\r\n");
+#endif
 
-// int main (void)
-// {	
-// 	// Struct of PIO Port D
-// 	GPIO_TypeDef *PB = GPIOB;
+	// Initialize the application task system
+	AppTask_Init();
+	// Add the background task to the application task system
+	AppTask_Add(&backgroundTask);
 
-// 	// blue LED is PD15
-// 	// set mode to 01 -> output
-// 	PB->MODER = (1 << (7*2));
+	// Main application loop
+	while (true)
+	{
+		// Your application code here
+		// For example, toggle an LED or read a sensor
+		AppTask_Run();
+	}
 
-// 	// switch LED on (is connected between IO and GND)
-// 	PB->ODR = (1 << 7);
-
-// 	while(1) {
-// 		w->KR = 0x0000AAAA;
-
-// 		// PD->ODR = (1 << 15);
-// 		// delay_us(1000000);
-		
-// 		// PD->ODR = (0 << 15);
-// 		// delay_us(1000000);
-// 	}
-// }
-
-static void _Delay(int period) {
-  int i = 100000*period;
-  do { ; } while (i--);
-}
-
-static IWDG_TypeDef *w = IWDG;
-int main(void) {
-	do {
-		w->KR = 0x0000AAAA;
-		SEGGER_RTT_WriteString(0, "Hello World from SEGGER!\r\n");
-		_Delay(100);
-	} while (1);
-
-  return 0;
+	return 0; // Should never reach here
 }
