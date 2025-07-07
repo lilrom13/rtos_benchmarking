@@ -1,6 +1,7 @@
 # C compiler
 CC = arm-none-eabi-gcc
 AS = arm-none-eabi-as
+SIZE = arm-none-eabi-size
 
 # Project folders
 CORE_DIR	= core
@@ -42,32 +43,54 @@ LINKFLAGS += -Wl,--relax -Wl,--gc-sections
 CCFLAGS += -O0 -g
 CCFLAGS += -DDEBUG
 
+#FreeRTOS configuration
+CCFLAGS += -DFREERTOS
+
 # Third party libraries
 ## SEGGER Real-Time Transfer (RTT) and SystemView
 ### Source files
 C_SEGGER_SRC_FILES := $(wildcard $(THIRD_DIR)/SEGGER/*.c)
 ### Include files
-INC = -I$(THIRD_DIR)/SEGGER/include
+INC += -I$(CORE_DIR)/include/config/SEGGER
+INC += -I$(THIRD_DIR)/SEGGER/include
+
+## Freertos
+### Source files
+C_FREERTOS_SRC_FILES := $(wildcard $(THIRD_DIR)/FreeRTOS/*.c)
+### Include files
+INC += -I$(CORE_DIR)/include/config/FreeRTOS
+INC += -I$(THIRD_DIR)/FreeRTOS/include
+
+## HAL driver
+### Source files
+C_HAL_SRC_FILES := 	$(DRIVERS_DIR)/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c \
+					$(DRIVERS_DIR)/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c \
+					$(DRIVERS_DIR)/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c
+### Include files
+INC += -I$(DRIVERS_DIR)/STM32F4xx_HAL_Driver/Inc/
 
 # Application source files
 ## Core application files
 ### Source files
-C_APP_SRC_FILES 	:= 	$(CORE_DIR)/startup.c \
+C_APP_SRC_FILES 	:= 	$(CORE_DIR)/system_stm32f4xx.c \
+						$(CORE_DIR)/stm32f4xx_nucleo_144.c \
+						$(CORE_DIR)/startup.c \
 						$(CORE_DIR)/main.c \
-						$(CORE_DIR)/app_task.c
+						$(CORE_DIR)/app_task.c \
+						$(CORE_DIR)/app_hook.c
 ### Include files
 INC += -I$(CORE_DIR)/include
-INC += -I$(DRIVERS_DIR)/Device/ST/Include
-INC += -I$(DRIVERS_DIR)/BSP/STM32F4xx_Nucleo_144/include
-INC += -I$(DRIVERS_DIR)/CMSIS/CMSIS/Core/Include
-INC += -I$(DRIVERS_DIR)/CMSIS/Device/ST/STM32F4xx/include
-INC += -I$(DRIVERS_DIR)/STM32F4xx_HAL_Driver/Inc/
+INC += -I$(CORE_DIR)/include/config
 
 # Combine all the source files to be compiled
-C_SRC_FILES := $(C_APP_SRC_FILES) $(C_SEGGER_SRC_FILES)
+C_SRC_FILES := $(C_APP_SRC_FILES) $(C_SEGGER_SRC_FILES) $(C_FREERTOS_SRC_FILES) $(C_HAL_SRC_FILES)
 
 # Create a list of object files to be generated
 OBJECTS += $(patsubst %.c,$(OBJDIR)/%.o,$(C_SRC_FILES))
+
+# Others
+## Include files
+INC += -I$(DRIVERS_DIR)/CMSIS/CMSIS/Core/Include
 
 LINKER_SCRIPT := $(LINKER_DIR)/stm32f4xx.ld
 
@@ -77,6 +100,7 @@ $(OUTPUT)/program.elf: $(OBJECTS)
 	@echo "Executing target '$@'"
 	@mkdir -p $(OUTPUT)
 	$(CC) $(LINKFLAGS) -T$(LINKER_SCRIPT) -o $(OUTPUT)/program.elf $(OBJECTS)
+	$(SIZE) $(OUTPUT)/program.elf
 
 $(OBJDIR)/%.o: %.c
 	@echo "Building file '$<' to '$(@)'"

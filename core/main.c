@@ -1,46 +1,61 @@
+#include "SEGGER_SYSVIEW.h"
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "FreeRTOS.h"
+#include "task.h"
 
-#include <stm32f4xx.h>
+#include "stm32f4xx_nucleo_144.h"
 
-#include "app_task.h"
+#include "app_config.h"
 
-#include "config/app_config.h"
+#define PRINT_SYSTEM_INFO 1
 
 #ifdef APP_DEBUG
 	#include "SEGGER_SYSVIEW.h"
 	#include "SEGGER_RTT.h"
 #endif
 
-static AppTaskInfo backgroundTask = {
-	.taskId = 1,
-	.name = "Background Task",
-	.taskFunction = NULL, // Define your background task function here
-	.priority = APP_TASK_PRIORITY_LOWEST
-};
+// Stack and TCB for the task
+#define STACK_SIZE 128
+
+static StackType_t xTaskStack[STACK_SIZE];
+static StaticTask_t xTaskBuffer;
+
+void vBackgroundTaskFunction(void *pvParameters);
 
 int main(void)
 {
-#ifdef APP_DEBUG
-	// Initialize SEGGER SystemView for debugging
-	SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL);
+	HAL_Init();                       /* Init HAL & FPU, set up SysTick          */
+    __HAL_RCC_GPIOB_CLK_ENABLE();     /* 1. Enable GPIOB peripheral clock        */
 
-	SEGGER_RTT_WriteString(0, "Real-Time Application\r\n\r\n");
-#endif
+    GPIO_InitTypeDef io = {0};
+    io.Pin   = GPIO_PIN_7;            /* 2. Select PB7 (LD2 – blue)              */
+    io.Mode  = GPIO_MODE_OUTPUT_PP;   /* push–pull output                        */
+    io.Pull  = GPIO_NOPULL;           /* no internal pull-up/down                */
+    io.Speed = GPIO_SPEED_FREQ_LOW;   /* slew rate → don’t care for an LED       */
+    HAL_GPIO_Init(GPIOB, &io);
 
-	// Initialize the application task system
-	AppTask_Init();
-	// Add the background task to the application task system
-	AppTask_Add(&backgroundTask);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_SET);  /* 3. LED ON          */
 
-	// Main application loop
-	while (true)
+	xTaskCreateStatic(vBackgroundTaskFunction, "tBackground", STACK_SIZE, NULL, tskIDLE_PRIORITY, xTaskStack, &xTaskBuffer);
+
+	xPortStartScheduler();
+
+     while (1) { /* nothing */ }
+}
+
+void vBackgroundTaskFunction(void *pvParameters)
+{
+	// This is a placeholder for the background task function
+	// Implement your background task functionality here
+	pvParameters = NULL;
+
+	while (1)
 	{
-		// Your application code here
+		// Simulate some work in the background task
 		// For example, toggle an LED or read a sensor
-		AppTask_Run();
+		// This is just a placeholder; replace with actual functionality
+		#ifdef APP_DEBUG
+			SEGGER_RTT_WriteString(0, "Background Task Running\r\n");
+		#endif
 	}
-
-	return 0; // Should never reach here
 }

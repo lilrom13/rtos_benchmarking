@@ -8,6 +8,21 @@
     #define printf(...) SEGGER_RTT_printf(0, __VA_ARGS__)
 #endif
 
+#ifdef FREERTOS
+    #include "FreeRTOS.h"
+    #include "task.h"
+    
+    #include "FreeRTOSConfig.h"
+    #define APP_FREERTOS 1
+
+    #define APP_TASK_CREATE(xTaskFunction, name, stackSize, parameters, priority, taskHandle) \
+        xTaskCreate((xTaskFunction), (name), (stackSize), (parameters), (priority), (taskHandle))
+
+    #define AppTaskHandle TaskHandle_t
+
+    #define APP_TASK_NAME_MAX_LENGTH configMAX_TASK_NAME_LEN
+#endif
+
 // Task priorities for the application
 // Lower numbers indicate higher priority
 #define APP_TASK_PRIORITY_LOWEST    10 // Lowest priority for background tasks

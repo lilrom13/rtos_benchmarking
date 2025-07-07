@@ -24,7 +24,15 @@ I personally don't use debuggers. They are slow and archaic and I don't need the
 
 ### ST
 
-- [NUCLEO-F429ZI](./docs/st/dm00244518.pdf)
-- [STM32F429xx](./docs/st/stm32f429zi.pdf)
+- [NUCLEO-F429ZI](docs/st/dm00244518.pdf)
+- [STM32F429xx](docs/st/stm32f429zi.pdf)
 
 ### ARM
+
+- [Arm® Cortex®-M4 Processor](docs/st/arm_cortexm4_processor_trm_100166_0001_04_en.pdf)
+- [Cortex™-M4 Technical Reference Manual](docs/st/DDI0439B_ERRATA_01.pdf)
+- [Mastering the FreeRTOS™ Real Time Kernel](docs/other/Mastering-the-FreeRTOS-Real-Time-Kernel.v1.1.0.pdf)
+
+## Device configuration
+
+![NUCLEO-F429ZI](docs/images/NUCLEO-F429ZI.png)
