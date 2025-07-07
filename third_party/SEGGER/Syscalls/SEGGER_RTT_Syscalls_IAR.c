@@ -45,58 +45,75 @@
 *       SystemView version: 3.60e                                    *
 *                                                                    *
 **********************************************************************
--------------------------- END-OF-HEADER -----------------------------
-
-File    : SEGGER_SYSVIEW_Conf.h
-Purpose : SEGGER SystemView configuration file.
-          Set defines which deviate from the defaults (see SEGGER_SYSVIEW_ConfDefaults.h) here.          
-Revision: $Rev: 21292 $
-
-Additional information:
-  Required defines which must be set are:
-    SEGGER_SYSVIEW_GET_TIMESTAMP
-    SEGGER_SYSVIEW_GET_INTERRUPT_ID
-  For known compilers and cores, these might be set to good defaults
-  in SEGGER_SYSVIEW_ConfDefaults.h.
-  
-  SystemView needs a (nestable) locking mechanism.
-  If not defined, the RTT locking mechanism is used,
-  which then needs to be properly configured.
+---------------------------END-OF-HEADER------------------------------
+File    : SEGGER_RTT_Syscalls_IAR.c
+Purpose : Low-level functions for using printf() via RTT in IAR.
+          To use RTT for printf output, include this file in your
+          application and set the Library Configuration to Normal.
+Revision: $Rev: 24316 $
+----------------------------------------------------------------------
 */
+#ifdef __IAR_SYSTEMS_ICC__
 
-#ifndef SEGGER_SYSVIEW_CONF_H
-#define SEGGER_SYSVIEW_CONF_H
-
-/*********************************************************************
-*
-*       Defines, configurable
-*
-**********************************************************************
-*/
-
-/*********************************************************************
-*
-*       Define: SEGGER_SYSVIEW_SECTION
-*
-*  Description
-*    Section to place the SystemView RTT Buffer into.
-*  Default
-*    undefined: Do not place into a specific section.
-*  Notes
-*    If SEGGER_RTT_SECTION is defined, the default changes to use
-*    this section for the SystemView RTT Buffer, too.
-*/
-#if !(defined SEGGER_SYSVIEW_SECTION) && (defined SEGGER_RTT_BUFFER_SECTION)
-  #define SEGGER_SYSVIEW_SECTION                  SEGGER_RTT_BUFFER_SECTION
+//
+// Since IAR EWARM V8 and EWRX V4, yfuns.h is considered as deprecated and LowLevelIOInterface.h
+// shall be used instead. To not break any compatibility with older compiler versions, we have a
+// version check in here.
+//
+#if ((defined __ICCARM__) && (__VER__ >= 8000000)) || ((defined __ICCRX__)  && (__VER__ >= 400))
+  #include <LowLevelIOInterface.h>
+#else
+  #include <yfuns.h>
 #endif
 
+#include "SEGGER_RTT.h"
+#pragma module_name = "?__write"
 
 /*********************************************************************
-* TODO: Add your defines here.                                       *
+*
+*       Function prototypes
+*
 **********************************************************************
 */
+size_t __write(int handle, const unsigned char * buffer, size_t size);
 
+/*********************************************************************
+*
+*       Global functions
+*
+**********************************************************************
+*/
+/*********************************************************************
+*
+*       __write()
+*
+* Function description
+*   Low-level write function.
+*   Standard library subroutines will use this system routine
+*   for output to all files, including stdout.
+*   Write data via RTT.
+*/
+size_t __write(int handle, const unsigned char * buffer, size_t size) {
+  (void) handle;  /* Not used, avoid warning */
+  SEGGER_RTT_Write(0, (const char*)buffer, size);
+  return size;
+}
 
-#endif  // SEGGER_SYSVIEW_CONF_H
+/*********************************************************************
+*
+*       __write_buffered()
+*
+* Function description
+*   Low-level write function.
+*   Standard library subroutines will use this system routine
+*   for output to all files, including stdout.
+*   Write data via RTT.
+*/
+size_t __write_buffered(int handle, const unsigned char * buffer, size_t size) {
+  (void) handle;  /* Not used, avoid warning */
+  SEGGER_RTT_Write(0, (const char*)buffer, size);
+  return size;
+}
 
-/*************************** End of file ****************************/
+#endif
+/****** End Of File *************************************************/
