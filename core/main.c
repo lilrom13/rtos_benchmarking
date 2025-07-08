@@ -1,5 +1,6 @@
 #include "SEGGER_SYSVIEW.h"
 
+#include "SEGGER_SYSVIEW_FreeRTOS.h"
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -10,7 +11,6 @@
 #define PRINT_SYSTEM_INFO 1
 
 #ifdef APP_DEBUG
-	#include "SEGGER_SYSVIEW.h"
 	#include "SEGGER_RTT.h"
 #endif
 
@@ -35,6 +35,8 @@ int main(void)
     HAL_GPIO_Init(GPIOB, &io);
 
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_SET);  /* 3. LED ON          */
+
+	SEGGER_SYSVIEW_Conf(); /* Configure and initialize SystemView */
 
 	xTaskCreateStatic(vBackgroundTaskFunction, "tBackground", STACK_SIZE, NULL, tskIDLE_PRIORITY, xTaskStack, &xTaskBuffer);
 

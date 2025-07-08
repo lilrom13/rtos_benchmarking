@@ -50,6 +50,8 @@ CCFLAGS += -DFREERTOS
 ## SEGGER Real-Time Transfer (RTT) and SystemView
 ### Source files
 C_SEGGER_SRC_FILES := $(wildcard $(THIRD_DIR)/SEGGER/*.c)
+S_SEGGER_SRC_FILES := $(wildcard $(THIRD_DIR)/SEGGER/*.S)
+C_SEGGER_SRC_FILES += $(wildcard $(THIRD_DIR)/SEGGER/Config/Cortex-M/*.c)
 ### Include files
 INC += -I$(CORE_DIR)/include/config/SEGGER
 INC += -I$(THIRD_DIR)/SEGGER/include
@@ -84,9 +86,13 @@ INC += -I$(CORE_DIR)/include/config
 
 # Combine all the source files to be compiled
 C_SRC_FILES := $(C_APP_SRC_FILES) $(C_SEGGER_SRC_FILES) $(C_FREERTOS_SRC_FILES) $(C_HAL_SRC_FILES)
+S_SRC_FILES := $(S_SEGGER_SRC_FILES)
 
 # Create a list of object files to be generated
-OBJECTS += $(patsubst %.c,$(OBJDIR)/%.o,$(C_SRC_FILES))
+OBJECTS := $(patsubst %.c,$(OBJDIR)/%.o,$(C_SRC_FILES))
+OBJECTS += $(patsubst %.S,$(OBJDIR)/%.o,$(S_SRC_FILES))
+
+$(info    OBJECTS are $(OBJECTS))
 
 # Others
 ## Include files
@@ -103,7 +109,13 @@ $(OUTPUT)/program.elf: $(OBJECTS)
 	$(SIZE) $(OUTPUT)/program.elf
 
 $(OBJDIR)/%.o: %.c
-	@echo "Building file '$<' to '$(@)'"
+	@echo "Building C file '$<' to '$(@)'"
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) $(CCFLAGS) $(INC) -c -o $(OBJDIR)/$*.o $<
+
+# .S files can be compile by gcc too
+$(OBJDIR)/%.o: %.S
+	@echo "Building S file '$<' to '$(@)'"
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) $(CCFLAGS) $(INC) -c -o $(OBJDIR)/$*.o $<
 

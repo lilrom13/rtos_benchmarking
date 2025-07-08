@@ -167,4 +167,7 @@
 #define xPortPendSVHandler PendSV_Handler
 #define xPortSysTickHandler SysTick_Handler
 
+/* From segger documentation */
+#include "SEGGER_SYSVIEW_FreeRTOS.h"
+
 #endif /* FREERTOS_CONFIG_H */

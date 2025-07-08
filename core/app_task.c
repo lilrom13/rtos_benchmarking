@@ -1,7 +1,5 @@
 #include "FreeRTOS.h"
 
-#include "app_task.h"
-
 void vApplicationGetTimerTaskMemory( StaticTask_t **ppxTimerTaskTCBBuffer, 
                                      StackType_t **ppxTimerTaskStackBuffer, 
                                      uint32_t *pulTimerTaskStackSize )
